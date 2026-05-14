@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leia SP Cloud Bot</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0b0e14;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .card {
+            background-color: #151a24;
+            padding: 40px 30px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 360px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        h2 {
+            color: #ffffff;
+            font-size: 24px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        input {
+            width: 100%;
+            padding: 14px;
+            background-color: #1f2633;
+            border: 1px solid #2d3748;
+            border-radius: 6px;
+            color: #ffffff;
+            font-size: 15px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        input:focus {
+            border-color: #e53e3e;
+        }
+        input::placeholder {
+            color: #4a5568;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: #e53e3e;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #c53030;
+        }
+        .status {
+            color: #718096;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>Leia SP Cloud Bot 🚀</h2>
+        
+        <div class="input-group">
+            <input type="text" id="ra" placeholder="Digite o RA">
+        </div>
+        <div class="input-group">
+            <input type="text" id="digito" placeholder="Dígito do RA">
+        </div>
+        <div class="input-group">
+            <input type="password" id="senha" placeholder="Digite a Senha">
+        </div>
+
+        <button id="btnIniciar">Iniciar Leituras</button>
+        
+        <div class="status" id="statusTxt">Pronto para iniciar...</div>
+    </div>
+
+    <!-- Vincula a lógica do robô -->
+    <script src="script.js"></script>
+</body>
+</html>
+  
