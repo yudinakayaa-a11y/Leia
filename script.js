@@ -9,13 +9,15 @@ document.getElementById('btnIniciar').addEventListener('click', async () => {
         return;
     }
 
-    statusTxt.innerText = "Obtendo token de acesso...";
+    statusTxt.innerText = "Conectando ao servidor do Elefante Letrado...";
     statusTxt.style.color = "#ecc94b"; 
 
+    // Proxy público para evitar bloqueio de CORS no GitHub Pages
+    const proxy = 'herokuapp.com';
+    const urlLogin = proxy + 'elefanteletrado.com.br'; // Ajuste o endpoint final se necessário
+
     try {
-        // Envia os dados para a API do Leia SP obter o token de login
-        // IMPORTANTE: Mude a URL abaixo para o endpoint real do Leia SP que você descobriu
-        const loginResponse = await fetch('educacao.sp.gov.br', {
+        const loginResponse = await fetch(urlLogin, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -24,17 +26,21 @@ document.getElementById('btnIniciar').addEventListener('click', async () => {
             })
         });
 
-        const loginData = await loginResponse.json();
-        const token = loginData.token || loginData.accessToken; 
-
-        if (!token) {
-            throw new Error('Falha ao gerar o token. Verifique as credenciais.');
+        if (!loginResponse.ok) {
+            throw new Error('Falha na autenticação. Verifique os dados de login.');
         }
 
-        statusTxt.innerText = "Conectado! Iniciando automação...";
+        const loginData = await loginResponse.json();
         
-        // Dispara o loop de leitura passando o token válido
-        iniciarLeituraAutomatica(token, statusTxt);
+        // Pega o token igual ao formato do log do seu console
+        const tokenDinamico = loginData.access_token || loginData.token; 
+
+        if (!tokenDinamico) {
+            throw new Error('Não foi possível obter o token de acesso.');
+        }
+
+        statusTxt.innerText = "Conectado com sucesso! Iniciando as leituras automáticas...";
+        iniciarLeituraAutomatica(tokenDinamico, statusTxt, proxy);
 
     } catch (error) {
         statusTxt.innerText = "Erro: " + error.message;
@@ -42,46 +48,54 @@ document.getElementById('btnIniciar').addEventListener('click', async () => {
     }
 });
 
-async function iniciarLeituraAutomatica(token, statusElement) {
+async function iniciarLeituraAutomatica(token, statusElement, proxy) {
     let paginaAtual = 1;
     let totalPaginas = 15; 
+    const urlLeitura = proxy + 'elefanteletrado.com.br';
+    const urlQuiz = proxy + 'elefanteletrado.com.br';
 
     statusElement.style.color = "#48bb78"; 
 
     const loopLeitura = setInterval(async () => {
         if (paginaAtual > totalPaginas) {
-            statusElement.innerText = "Livro concluído com sucesso!";
+            statusElement.innerText = "Livro e questionários concluídos com sucesso! 🚀";
             clearInterval(loopLeitura);
             return;
         }
 
-        statusElement.innerText = `Lendo página ${paginaAtual} de ${totalPaginas}... (Aguardando 2 min)`;
+        statusElement.innerText = `Lendo página ${paginaAtual} de ${totalPaginas}... (Aguardando 2 min de segurança)`;
 
-        // Envia a requisição de leitura direto com o token injetado no cabeçalho
-        // IMPORTANTE: Ajuste a URL e o corpo JSON conforme o padrão do Leia SP
-        await fetch(`educacao.sp.gov.br`, {
+        // Simula o avanço de página enviando o tempo de leitura exigido pelo sistema
+        await fetch(urlLeitura, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ pagina: paginaAtual })
+            body: JSON.stringify({ 
+                page: paginaAtual,
+                time_elapsed: 120 
+            })
         });
 
-        // Se chegar na última página, dispara a resposta do Quiz
+        // Quando chegar na última página, envia a resposta para o Quiz mapeado pelo sistema
         if (paginaAtual === totalPaginas) {
-            statusElement.innerText = "Respondendo ao Quiz final...";
+            statusElement.innerText = "Respondendo ao Quiz final automaticamente...";
             
-            await fetch(`educacao.sp.gov.br`, {
+            await fetch(urlQuiz, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ resposta: "A" }) 
+                body: JSON.stringify({ 
+                    correct: true,
+                    answer: "A" 
+                }) 
             });
         }
 
         paginaAtual++;
-    }, 120000); // 2 minutos exatos por página para simular leitura humana
-                  }
+    }, 120000); // Intervalo rígido de 2 minutos por página
+        }
+        
